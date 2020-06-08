@@ -1,0 +1,3 @@
+SELECT S1.sale_date, (S2.sold_num - S1.sold_num) AS diff
+FROM Sales AS S1 JOIN Sales AS S2
+ON S1.sale_date = S2.sale_date AND S1.fruit > S2.fruit
