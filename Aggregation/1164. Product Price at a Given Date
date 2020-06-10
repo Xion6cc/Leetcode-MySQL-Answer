@@ -1,0 +1,22 @@
+# My solution
+SELECT product_id, new_price AS price
+FROM
+(SELECT product_id, new_price, change_date, RANK() OVER (PARTITION BY product_id ORDER BY change_date DESC) AS date_rank
+FROM Products
+WHERE change_date <= '2019-08-16') AS A
+WHERE date_rank = 1
+UNION ALL
+(SELECT DISTINCT product_id, 10 AS price FROM Products 
+ WHERE change_date > '2019-08-16' AND product_id NOT IN 
+ (SELECT DISTINCT product_id FROM Products 
+ WHERE change_date <= '2019-08-16'))
+ 
+ # Others: how to group by product_id, rank by change_date, an then select new_price
+ 
+ SELECT distinct a.product_id,ifnull(temp.new_price,10) as price 
+FROM products as a
+LEFT JOIN
+(SELECT * 
+FROM products 
+WHERE (product_id, change_date) in (select product_id,max(change_date) from products where change_date<="2019-08-16" group by product_id)) as temp
+on a.product_id = temp.product_id;
