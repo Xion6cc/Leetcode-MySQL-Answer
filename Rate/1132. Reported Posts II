@@ -1,0 +1,9 @@
+SELECT ROUND(AVG(remove_percent) * 100, 2) AS average_daily_percent
+FROM
+(
+SELECT action_date, 
+COUNT(DISTINCT Removals.post_id) / COUNT(DISTINCT Actions.post_id) AS remove_percent
+FROM Actions
+LEFT JOIN Removals USING (post_id)
+WHERE extra = 'spam'
+GROUP BY action_date) AS A
