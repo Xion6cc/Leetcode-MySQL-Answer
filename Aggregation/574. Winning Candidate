@@ -1,0 +1,12 @@
+SELECT Name
+FROM
+(
+SELECT CandidateId, Name, COUNT(*) AS vote
+FROM Vote AS V JOIN Candidate AS C ON C.id = V.CandidateId
+GROUP BY CandidateId, Name
+ORDER BY vote DESC
+LIMIT 1) AS A
+
+
+SELECT C.Name FROM Candidate C
+WHERE id = (SELECT CandidateId FROM Vote GROUP BY CandidateId ORDER BY COUNT(id) DESC LIMIT 1);
