@@ -1,0 +1,10 @@
+SELECT book_id, name
+FROM
+(
+SELECT book_id, SUM(quantity) AS ttl_sold
+FROM Orders
+WHERE DATEDIFF('2019-06-23', dispatch_date) <= 365
+GROUP BY book_id) AS A
+RIGHT JOIN Books USING (book_id)
+WHERE DATEDIFF('2019-06-23', available_from) > 30
+AND (ttl_sold is null or ttl_sold <10)
