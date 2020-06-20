@@ -1,0 +1,16 @@
+SELECT Request_at AS Day,
+ROUND(SUM(CASE WHEN Status = 'cancelled_by_driver' OR Status = 'cancelled_by_client' THEN 1 ELSE 0 END) / COUNT(*), 2) AS `Cancellation Rate`
+FROM Trips AS T JOIN Users AS U1 ON T.Client_Id = U1.Users_Id
+JOIN Users AS U2 ON T.Driver_Id = U2.Users_Id
+WHERE U1.Banned = 'No' AND U2.Banned = 'No'
+AND Request_at BETWEEN '2013-10-01' AND '2013-10-03'
+GROUP BY request_at
+ORDER BY Day
+
+# Subquery
+SELECT Request_at as Day,
+       ROUND(COUNT(IF(Status != 'completed', TRUE, NULL)) / COUNT(*), 2) AS 'Cancellation Rate'
+FROM Trips
+WHERE (Request_at BETWEEN '2013-10-01' AND '2013-10-03')
+      AND Client_id NOT IN (SELECT Users_Id FROM Users WHERE Banned = 'Yes')
+GROUP BY Request_at;
