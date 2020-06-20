@@ -1,3 +1,5 @@
+# Question: Active users are those who logged in to their accounts for 5 or more consecutive days.
+
 SELECT DISTINCT a.id, name
 FROM Logins a 
 JOIN Logins b
@@ -6,4 +8,4 @@ WHERE a.id=b.id AND
 c.id = a.id AND
 DATEDIFF(a.login_date,b.login_date) BETWEEN 1 AND 4
 GROUP BY a.id, a.login_date
-HAVING COUNT(DISTINCT b.login_date)>=4
+HAVING COUNT(DISTINCT b.login_date)=4
