@@ -1,0 +1,28 @@
+SELECT A.pay_month, department_id,
+CASE WHEN dpmt_avg > company_avg THEN 'higher'
+     WHEN dpmt_avg < company_avg THEN 'lower'
+     ELSE 'same'
+ END AS comparison
+FROM
+(SELECT DATE_FORMAT(pay_date,'%Y-%m') AS pay_month, department_id, AVG(amount) AS dpmt_avg
+FROM salary JOIN employee USING (employee_id)
+GROUP BY pay_month, department_id) AS A
+JOIN
+(
+SELECT DATE_FORMAT(pay_date,'%Y-%m') AS pay_month, AVG(amount) AS company_avg
+FROM salary JOIN employee USING (employee_id)
+GROUP BY pay_month) AS B USING (pay_month)
+
+# Using window function and add more columns first
+select distinct mnth as pay_month, department_id,
+case when company_avg > dept_avg then 'lower' 
+     when company_avg < dept_avg then 'higher'
+     else 'same'end as comparison from
+(
+select left(pay_date,7) mnth,amount,department_id,
+avg(amount) over (partition by department_id, pay_date) dept_avg,
+avg(amount) over (partition by pay_date) company_avg from
+salary s inner join employee e
+on s.employee_id = e.employee_id
+) a
+order by mnth desc, department_id
