@@ -1,0 +1,20 @@
+# Use row_number to get a unique grouping label for each continous sequence
+select a.type as period_state, min(a.date) as start_date, max(a.date) as end_date
+from (
+    select a.*, DATE_ADD(a.date, - a.type_rank) as same_origin_date
+    from (
+        select a.*, row_number() over(partition by type order by date) as type_rank
+        from (
+            select 'failed' as type, fail_date as date 
+            from failed
+            where fail_date between '2019-01-01' and '2019-12-31'    
+            union    
+            select 'succeeded' as type, success_date as date 
+            from Succeeded
+            where success_date between '2019-01-01' and '2019-12-31'
+            ) a
+        ) a
+     ) a
+group by a.type, a.same_origin_date 
+order by 2
+;
