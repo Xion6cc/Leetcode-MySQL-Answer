@@ -1,3 +1,4 @@
+# One column used to GROUPBY
 SELECT item_category AS CATEGORY,
 SUM(CASE WHEN WEEKDAY(order_date) = 0 THEN quantity ELSE 0 END) AS 'MONDAY',
 SUM(CASE WHEN WEEKDAY(order_date) = 1 THEN quantity ELSE 0 END) AS 'TUESDAY',
