@@ -1,0 +1,45 @@
+# SQL Server
+SELECT user_id AS seller_id, ISNULL("2nd_item_fav_brand", 'no') AS "2nd_item_fav_brand"
+FROM
+(
+SELECT seller_id, 
+"2nd_item_fav_brand" = CASE WHEN A.favorite_brand = item_brand THEN 'yes'
+     ELSE 'no'
+ END
+FROM
+(
+SELECT seller_id, favorite_brand, item_brand,
+RANK() OVER (PARTITION BY seller_id ORDER BY order_date) AS rank
+FROM Orders AS O
+JOIN Users AS U ON O.seller_id = U.user_id
+JOIN Items AS I ON I.item_id = O.item_id) AS A
+WHERE rank = 2) AS B
+RIGHT JOIN Users AS U2 ON U2.user_id = B.seller_id
+
+# JOIN
+SELECT user_id as seller_id, 
+if(i.item_brand = u.favorite_brand, "yes", "no") as 2nd_item_fav_brand
+from Users u left join 
+    (SELECT o1.seller_id, o1.item_id, o1.order_date
+    FROM Orders o1 JOIN Orders o2
+    ON o1.seller_id = o2.seller_id AND o1.order_date > o2.order_date
+    GROUP BY o1.seller_id, o1.order_date
+    HAVING count(o1.order_id) = 1) t
+ON u.user_id = t.seller_id
+LEFT JOIN Items i
+ON t.item_id = i.item_id
+ORDER BY u.user_id;
+
+# OFFSET
+select user_id as seller_id, 
+        (case 
+            when favorite_brand = (
+                            select i.item_brand
+                            from Orders o left join Items i
+                            on o.item_id = i.item_id
+                            where o.seller_id = u.user_id 
+                            order by o.order_date
+                            limit 1 offset 1
+                                  ) then "yes" else "no" end
+         ) as "2nd_item_fav_brand"   
+from Users u  
