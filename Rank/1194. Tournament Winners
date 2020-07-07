@@ -1,0 +1,19 @@
+SELECT group_id, MIN(player_id) AS player_id
+FROM
+(
+SELECT group_id, player_id, score, RANK() OVER(PARTITION BY group_id ORDER BY score DESC) AS `rank`
+FROM
+(
+SELECT A.player_id, group_id, SUM(score) AS score
+FROM
+(
+SELECT first_player AS player_id, first_score AS score
+FROM Matches
+UNION ALL
+SELECT second_player AS player_id, second_score AS score
+FROM Matches) AS A
+JOIN Players AS P ON A.player_id = P.player_id
+GROUP BY player_id, group_id) AS B ) AS C
+WHERE `rank` = 1
+GROUP BY group_id
+ORDER BY group_id
