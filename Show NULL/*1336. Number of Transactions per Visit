@@ -1,0 +1,19 @@
+# Create a master list as cte
+WITH cte AS
+(
+SELECT row_number() over(order by user_id) as transactions_count from (select user_id FROM Visits UNION ALL SELECT user_id FROM Transactions) t UNION SELECT 0 AS transactions_count),
+cte2 AS
+(
+SELECT transactions_count, COUNT(*) AS visits_count
+FROM
+(
+SELECT V.user_id, visit_date, COUNT(transaction_date) AS transactions_count, COUNT(DISTINCT V.user_id) AS visits_count
+FROM Visits AS V LEFT JOIN Transactions AS T
+ON V.user_id = T.user_id AND V.visit_date = T.transaction_date
+GROUP BY V.user_id, visit_date) AS A
+GROUP BY transactions_count)
+SELECT cte.transactions_count, IFNULL(visits_count, 0) AS visits_count
+FROM cte LEFT JOIN cte2
+USING(transactions_count)
+WHERE cte.transactions_count <= (SELECT MAX(transactions_count) FROM cte2)
+ORDER BY cte.transactions_count
