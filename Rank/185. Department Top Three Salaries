@@ -1,0 +1,13 @@
+SELECT Department, Employee, Salary
+FROM
+(
+SELECT D.Name AS Department, E.Name AS Employee, Salary,
+DENSE_RANK() OVER(PARTITION BY DepartmentId ORDER BY Salary DESC) AS rank
+FROM Employee AS E JOIN Department AS D ON E.DepartmentId = D.Id) AS A
+WHERE rank <= 3
+
+# Using subquery
+# For each (A) employee, find other (B) employees that have higher salary. If there is less than three employees have higher salary than (A), then (A) is top 3.
+Select dep.Name as Department, emp.Name as Employee, emp.Salary from Department dep, 
+Employee emp where emp.DepartmentId=dep.Id and 
+(Select count(distinct Salary) From Employee where DepartmentId=dep.Id and Salary>emp.Salary)<3
