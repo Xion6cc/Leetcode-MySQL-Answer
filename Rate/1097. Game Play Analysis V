@@ -1,0 +1,18 @@
+SELECT B.event_date AS install_dt, 
+COUNT(*) AS installs,
+ROUND(IFNULL(COUNT(A.event_date) / COUNT(*), 0), 2) AS Day1_retention 
+FROM Activity AS A
+RIGHT JOIN 
+(
+SELECT A2.player_id, A2.event_date
+FROM Activity AS A1 JOIN Activity AS A2
+ON A1.player_id = A2.player_id AND A1.event_date <= A2.event_date
+GROUP BY A2.player_id, A2.event_date
+HAVING COUNT(*) = 1) AS B
+ON A.player_id = B.player_id AND A.event_date = DATE_ADD(B.event_date, INTERVAL 1 DAY)
+GROUP BY B.event_date
+
+# Get the minimal date directly
+SELECT player_id, MIN(event_date) AS install_dt 
+FROM Activity
+GROUP BY player_id
