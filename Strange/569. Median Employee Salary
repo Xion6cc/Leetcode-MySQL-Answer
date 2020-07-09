@@ -1,0 +1,33 @@
+# Find the median
+SELECT Id, Company, Salary FROM 
+(SELECT Id, Company, Salary, ROW_NUMBER() OVER (PARTITION BY Company ORDER BY Salary) AS `rank`
+FROM Employee) AS B
+JOIN
+(
+SELECT Company, COUNT(*) AS employee_num, 
+CASE WHEN COUNT(*) % 2 = 0 THEN 'even' ELSE 'odd' END AS number
+FROM Employee
+GROUP BY Company) AS A
+USING (Company)
+WHERE number = 'even' AND (`rank` = employee_num / 2 OR `rank` = employee_num / 2 + 1)
+OR number = 'odd' AND `rank` = (employee_num + 1) / 2
+ORDER BY Company, Salary
+
+# Magic 1
+with t1 as(
+select *, row_number() over(partition by Company order by Salary) as row,
+count(Id) over(partition by Company) as cnt
+from Employee )
+
+select Id, Company, Salary
+from t1
+where row between cnt/2.0 and cnt/2.0+1;
+
+# Magic 2
+SELECT Id, Company, Salary
+FROM (
+SELECT *, ROW_NUMBER() OVER(PARTITION BY COMPANY ORDER BY Salary ASC, Id ASC) AS RN_ASC,
+ROW_NUMBER() OVER(PARTITION BY COMPANY ORDER BY Salary DESC, Id DESC) AS RN_DESC
+FROM Employee) AS temp
+WHERE RN_ASC BETWEEN RN_DESC - 1 AND RN_DESC + 1
+ORDER BY Company, Salary;
