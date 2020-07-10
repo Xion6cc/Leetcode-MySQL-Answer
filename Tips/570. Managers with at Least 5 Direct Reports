@@ -1,0 +1,5 @@
+# GROUP BY then HAVING, cannot use WHERE then GROUP BY
+SELECT Name
+FROM Employee
+WHERE Id IN 
+(SELECT ManagerId FROM Employee GROUP BY ManagerId HAVING COUNT(*) >= 5)
