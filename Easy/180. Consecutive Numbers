@@ -1,0 +1,4 @@
+SELECT DISTINCT l1.Num AS ConsecutiveNums
+FROM Logs AS l1
+JOIN logs AS l2 ON l1.id + 1 = l2.id AND l1.Num = l2.Num
+JOIN logs AS l3 ON l2.id + 1 = l3.id AND l3.Num = l2.Num
