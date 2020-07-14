@@ -1,0 +1,11 @@
+SELECT customer_id, name FROM
+(
+SELECT customer_id, name, DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(price * quantity) AS spending
+FROM Orders
+JOIN Product USING (product_id)
+JOIN Customers USING (customer_id)
+GROUP BY customer_id, name, month
+HAVING spending >= 100
+AND month IN ('2020-06', '2020-07')) AS A
+GROUP BY customer_id, name
+HAVING COUNT(*) = 2
