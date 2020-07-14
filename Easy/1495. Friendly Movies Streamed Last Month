@@ -1,0 +1,6 @@
+SELECT DISTINCT title
+FROM Content JOIN TVProgram
+USING (content_id)
+WHERE Kids_content = 'Y'
+AND DATE_FORMAT(program_date, '%Y-%m') = '2020-06'
+AND content_type = 'Movies'
