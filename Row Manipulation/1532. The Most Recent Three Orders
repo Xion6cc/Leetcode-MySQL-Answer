@@ -1,0 +1,6 @@
+SELECT name AS customer_name, O1.customer_id, O1.order_id, O1.order_date
+FROM Orders AS O1 JOIN Customers AS C ON O1.customer_id = C.customer_id
+JOIN Orders AS O2 ON O1.order_date <= O2.order_date AND O1.customer_id = O2.customer_id
+GROUP BY customer_name, O1.customer_id, O1.order_id, O1.order_date
+HAVING COUNT(O2.order_date) < 4
+ORDER BY customer_name, customer_id, order_date DESC
