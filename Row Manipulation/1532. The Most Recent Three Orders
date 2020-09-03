@@ -4,3 +4,15 @@ JOIN Orders AS O2 ON O1.order_date <= O2.order_date AND O1.customer_id = O2.cust
 GROUP BY customer_name, O1.customer_id, O1.order_id, O1.order_date
 HAVING COUNT(O2.order_date) < 4
 ORDER BY customer_name, customer_id, order_date DESC
+
+# rank
+SELECT  name AS customer_name, customer_id, order_id, order_date
+FROM 
+(SELECT customer_id, order_id, order_date, dense_rank() OVER (PARTITION BY customer_id ORDER BY order_date DESC) AS `rank`
+FROM Orders) AS A
+JOIN Customers USING(customer_id)
+WHERE `rank` < 4
+order by
+    customer_name,
+    customer_id,
+    order_date desc
