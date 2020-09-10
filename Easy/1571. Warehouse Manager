@@ -1,0 +1,4 @@
+SELECT name AS WAREHOUSE_NAME, SUM(width * Length * Height * units) AS VOLUME
+FROM Warehouse JOIN Products
+USING (product_id)
+GROUP BY WAREHOUSE_NAME
