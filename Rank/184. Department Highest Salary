@@ -1,0 +1,17 @@
+SELECT Department, Employee, Salary
+FROM
+(
+SELECT D.Name AS Department, E.Name AS Employee, Salary, RANK() OVER (PARTITION BY DepartmentId ORDER BY Salary DESC) AS Salary_rank
+FROM Employee AS E JOIN Department AS D ON E.DepartmentId = D.Id) AS A
+WHERE Salary_rank = 1
+
+# WHERE filter
+SELECT D.Name AS Department, E.name AS Employee, Salary
+FROM Employee AS E
+JOIN
+(
+SELECT DepartmentId, MAX(Salary) AS max_salary
+FROM Employee
+GROUP BY DepartmentId
+) AS A ON Salary = max_salary AND E.DepartmentId = A.DepartmentId
+JOIN Department AS D ON E.DepartmentId = D.Id
