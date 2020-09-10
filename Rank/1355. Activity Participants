@@ -1,0 +1,34 @@
+SELECT activity
+FROM
+(
+SELECT activity, num_activity, RANK() OVER(ORDER BY num_activity) AS asc_rank,
+RANK() OVER(ORDER BY num_activity DESC) AS desc_rank
+FROM
+(
+SELECT activity, COUNT(*) AS num_activity
+FROM Friends
+GROUP BY activity) AS A) AS B
+WHERE asc_rank <> 1 AND desc_rank <> 1
+
+
+# Using aggregation inside the window function
+SELECT activity
+FROM
+(
+SELECT activity, RANK() OVER(ORDER BY COUNT(*)) AS asc_rank,
+RANK() OVER(ORDER BY COUNT(*) DESC) AS desc_rank
+FROM Friends
+GROUP BY activity) AS A
+WHERE asc_rank <> 1 AND desc_rank <> 1
+
+# MAX and MIN select the number with rank directly
+SELECT activity
+FROM (
+SELECT activity, COUNT(*) AS 'act_num', MAX(COUNT(*)) OVER() AS 'max_act', 
+    MIN(COUNT(*)) OVER() AS 'min_act'
+FROM Friends
+GROUP BY activity
+ORDER BY act_num DESC
+) AS TABLE1
+WHERE act_num NOT IN (max_act, min_act)
+;
