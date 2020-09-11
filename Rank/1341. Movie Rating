@@ -1,0 +1,30 @@
+
+# GROUP BY, RANK, WHERE filter
+(SELECT name AS results FROM
+(SELECT name, RANK() OVER (ORDER BY num_movie DESC) AS rank_id
+FROM
+(SELECT name, COUNT(DISTINCT movie_id) AS num_movie 
+ FROM Users JOIN Movie_Rating USING (user_id)
+ GROUP BY name) AS A) AS B
+WHERE rank_id = 1
+ORDER BY name LIMIT 1)
+UNION ALL
+(SELECT title AS results FROM
+ (SELECT title, RANK() OVER (ORDER BY avg_rating DESC) AS rating_rank FROM
+ (SELECT title, AVG(rating) AS avg_rating FROM Movies JOIN Movie_Rating USING (movie_id)
+ WHERE LEFT(created_at, 7) = '2020-02' GROUP BY title) AS A) AS B WHERE rating_rank = 1 ORDER BY title LIMIT 1)
+
+
+# Using ORDER BY and LIMIT to select records with highest rank
+(SELECT name AS results
+FROM Users JOIN Movie_Rating USING (user_id)
+GROUP BY name
+ORDER BY COUNT(DISTINCT movie_id) DESC, name
+LIMIT 1)
+UNION ALL
+(SELECT title AS results
+FROM Movies JOIN Movie_Rating USING (movie_id)
+WHERE LEFT(created_at, 7) = '2020-02'
+GROUP BY title
+ORDER BY AVG(rating) DESC, title
+LIMIT 1)
