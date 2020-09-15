@@ -1,0 +1,2 @@
+SELECT id, `year`, IFNULL(npv, 0) AS npv
+FROM NPV AS N RIGHT JOIN Queries AS Q USING (id, year)
