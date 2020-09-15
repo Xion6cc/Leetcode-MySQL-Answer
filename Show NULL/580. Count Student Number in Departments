@@ -1,0 +1,14 @@
+# indirectly
+SELECT dept_name, IFNULL(student_number, 0) AS student_number  FROM
+(
+SELECT dept_name, COUNT(*) AS student_number
+FROM student JOIN department USING (dept_id)
+GROUP BY dept_name) AS A
+RIGHT JOIN department AS B USING (dept_name)
+ORDER BY student_number DESC, dept_name
+
+# directly
+SELECT d.dept_name, IFNULL(COUNT(s.student_id)) AS student_number
+FROM student s RIGHT JOIN department d ON s.dept_id = d.dept_id
+GROUP BY d.dept_name 
+ORDER BY student_number DESC, d.dept_name;
