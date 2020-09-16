@@ -1,0 +1,13 @@
+SELECT user_id, user_name, SUM(amount) AS credit, CASE WHEN SUM(amount) > 0 THEN 'No' ELSE 'Yes' END AS credit_limit_breached
+FROM
+(
+SELECT paid_by AS user_id, -amount AS amount
+FROM Transactions
+UNION ALL
+SELECT paid_to AS user_id, amount
+FROM Transactions
+UNION ALL
+SELECT user_id, credit AS amount
+FROM Users) AS A
+JOIN Users USING (user_id)
+GROUP BY user_id, user_name
