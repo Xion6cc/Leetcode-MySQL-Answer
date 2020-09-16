@@ -1,0 +1,8 @@
+SELECT left_operand, operator, right_operand, 
+CASE WHEN operator = '>' AND LEFT_V.value > RIGHT_V.value THEN 'true'
+     WHEN operator = '<' AND LEFT_V.value < RIGHT_V.value THEN 'true'
+     WHEN operator = '=' AND LEFT_V.value = RIGHT_V.value THEN 'true'
+     ELSE 'false'
+ END AS value
+FROM Variables AS LEFT_V JOIN Expressions AS E ON LEFT_V.name = E.left_operand
+JOIN Variables AS RIGHT_V ON RIGHT_V.name = E.right_operand
