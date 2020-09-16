@@ -1,0 +1,16 @@
+SELECT project_id, employee_id
+FROM
+(
+SELECT project_id, E.employee_id, RANK() OVER(PARTITION BY project_id ORDER BY experience_years DESC) AS rank_id
+FROM Project AS P JOIN Employee AS E ON P.employee_id = E.employee_id) AS A
+WHERE rank_id = 1
+
+# Using MySQL
+SELECT p.project_id, e.employee_id
+from project as p
+inner join employee as e on e.employee_id = p.employee_id
+where (p.project_id, e.experience_years) in
+(SELECT p.project_id, max(e.experience_years)
+from project as p
+inner join employee as e on e.employee_id = p.employee_id
+group by project_id)
