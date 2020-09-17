@@ -1,0 +1,19 @@
+SELECT business_id
+FROM
+(SELECT event_type, AVG(occurences) AS avg_occurences
+FROM Events
+GROUP BY event_type) AS A
+JOIN Events AS E USING (event_type)
+WHERE occurences > avg_occurences
+GROUP BY business_id
+HAVING COUNT(*) > 1
+
+
+# Using window function to add one more column directly
+SELECT business_id
+FROM
+(SELECT *, AVG(occurences) OVER(PARTITION BY event_type) AS avg_occurences
+FROM Events) AS A
+WHERE occurences > avg_occurences
+GROUP BY business_id
+HAVING COUNT(*) > 1
