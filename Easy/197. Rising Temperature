@@ -1,0 +1,5 @@
+SELECT W2.Id
+FROM Weather AS W1
+JOIN Weather AS W2
+ON DATE_ADD(W1.RecordDate, INTERVAL 1 DAY) = W2.RecordDate
+WHERE W1.Temperature < W2.Temperature
